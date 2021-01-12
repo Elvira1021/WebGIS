@@ -24,6 +24,7 @@
   <!-- Page plugins -->
   <!-- Argon CSS -->
   <link rel="stylesheet" href="assets/css/argon.css?v=1.2.0" type="text/css">
+  <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=d644ec9c6fac203f3818eb86bbeba5fe&plugin=AMap.Driving"></script>
 </head>
 
 <body>
@@ -151,8 +152,8 @@
               <div class="card-body">
                 <div class="row">
                   <div class="col">
-                    <h5 class="card-title text-uppercase text-muted mb-0">Total traffic</h5>
-                    <span class="h2 font-weight-bold mb-0">350,897</span>
+                    <h5 class="card-title text-uppercase text-muted mb-0">天气</h5>
+                    <span id ="tem"class="h2 font-weight-bold mb-0"></span>
                   </div>
                   <div class="col-auto">
                     <div class="icon icon-shape bg-gradient-red text-white rounded-circle shadow">
@@ -161,8 +162,7 @@
                   </div>
                 </div>
                 <p class="mt-3 mb-0 text-sm">
-                  <span class="text-success mr-2"><i class="fa fa-arrow-up"></i> 3.48%</span>
-                  <span class="text-nowrap">Since last month</span>
+                  <span id="time1" class="text-nowrap">Since last month</span>
                 </p>
               </div>
             </div>
@@ -173,8 +173,8 @@
               <div class="card-body">
                 <div class="row">
                   <div class="col">
-                    <h5 class="card-title text-uppercase text-muted mb-0">New users</h5>
-                    <span class="h2 font-weight-bold mb-0">2,356</span>
+                    <h5 class="card-title text-uppercase text-muted mb-0">湿度</h5>
+                    <span id="humi" class="h2 font-weight-bold mb-0" style="margin-top: 20px;">％RH</span>
                   </div>
                   <div class="col-auto">
                     <div class="icon icon-shape bg-gradient-orange text-white rounded-circle shadow">
@@ -183,8 +183,7 @@
                   </div>
                 </div>
                 <p class="mt-3 mb-0 text-sm">
-                  <span class="text-success mr-2"><i class="fa fa-arrow-up"></i> 3.48%</span>
-                  <span class="text-nowrap">Since last month</span>
+                  <span id="time2"class="text-nowrap"></span>
                 </p>
               </div>
             </div>
@@ -195,8 +194,8 @@
               <div class="card-body">
                 <div class="row">
                   <div class="col">
-                    <h5 class="card-title text-uppercase text-muted mb-0">Sales</h5>
-                    <span class="h2 font-weight-bold mb-0">924</span>
+                    <h5 class="card-title text-uppercase text-muted mb-0">天气</h5>
+                    <span id="wea"class="h2 font-weight-bold mb-0"></span>
                   </div>
                   <div class="col-auto">
                     <div class="icon icon-shape bg-gradient-green text-white rounded-circle shadow">
@@ -205,8 +204,8 @@
                   </div>
                 </div>
                 <p class="mt-3 mb-0 text-sm">
-                  <span class="text-success mr-2"><i class="fa fa-arrow-up"></i> 3.48%</span>
-                  <span class="text-nowrap">Since last month</span>
+                  
+                  <span id="time3"class="text-nowrap">Since last month</span>
                 </p>
               </div>
             </div>
@@ -217,8 +216,8 @@
               <div class="card-body">
                 <div class="row">
                   <div class="col">
-                    <h5 class="card-title text-uppercase text-muted mb-0">Perfor</h5>
-                    <span class="h2 font-weight-bold mb-0">49%</span>
+                    <h5 class="card-title text-uppercase text-muted mb-0">风向</h5>
+                    <span id="wind" class="h2 font-weight-bold mb-0">49%</span>
                   </div>
                   <div class="col-auto">
                     <div class="icon icon-shape bg-gradient-info text-white rounded-circle shadow">
@@ -227,8 +226,8 @@
                   </div>
                 </div>
                 <p class="mt-3 mb-0 text-sm">
-                  <span class="text-success mr-2"><i class="fa fa-arrow-up"></i> 3.48%</span>
-                  <span class="text-nowrap">Since last month</span>
+                  
+                  <span id="time4" class="text-nowrap">Since last month</span>
                 </p>
               </div>
             </div>
@@ -689,6 +688,31 @@
   </div>
   <!-- Argon Scripts -->
   <!-- Core -->
+  <script>
+    var humidity
+    console.log(1)
+    AMap.plugin('AMap.Weather', function() {
+    //创建天气查询实例
+    var weather = new AMap.Weather();
+    console.log(1)
+    //执行实时天气信息查询
+    weather.getLive('杭州市', function(err, data) {
+        console.log(err, data);
+        humidity=data.humidity
+        var oB = document.getElementById('humi');
+        oB.innerHTML = humidity+" %RH"
+        var time1 = document.getElementById('time1');
+        time1.innerHTML = data.reportTime
+        var oC = document.getElementById('tem');
+        oC.innerHTML = data.temperature+" °C "+data.weather
+        var time2 = document.getElementById('time2');
+        time2.innerHTML = data.reportTime
+
+
+    });
+  });
+  </script>
+  <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=d644ec9c6fac203f3818eb86bbeba5fe&plugin=AMap.Driving"></script>
   <script src="assets/vendor/jquery/dist/jquery.min.js"></script>
   <script src="assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
   <script src="assets/vendor/js-cookie/js.cookie.js"></script>

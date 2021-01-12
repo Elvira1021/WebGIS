@@ -24,8 +24,41 @@
   <!-- Page plugins -->
   <!-- Argon CSS -->
   <link rel="stylesheet" href="assets/css/argon.css?v=1.2.0" type="text/css">
-</head>
+  <!--Map-->
+  
+  <script src="https://a.amap.com/jsapi_demos/static/demo-center/js/demoutils.js"></script>
+  <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=d644ec9c6fac203f3818eb86bbeba5fe&plugin=AMap.Driving"></script>
+  <script type="text/javascript" src="https://cache.amap.com/lbs/static/addToolbar.js"></script>
+  <style type="text/css">
 
+    </style>
+    <style type="text/css">
+        #containerMap{
+          width: 100%;
+          height: 100%;
+        }
+        #panel1 {
+            position: fixed;
+            background-color: white;
+            max-height: 400px;
+            overflow-y: auto;
+            top: 100px;
+            right: 20px;
+            width: 320px;
+        }
+        #panel1 .amap-call {
+            background-color: #009cf9;
+            border-top-left-radius: 4px;
+   	        border-top-right-radius: 4px;
+        }
+        #panel1 .amap-lib-driving {
+	        border-bottom-left-radius: 4px;
+   	        border-bottom-right-radius: 4px;
+            overflow: hidden;
+        }
+    </style>
+
+</head>
 <body>
   <!-- Sidenav -->
   <nav class="sidenav navbar navbar-vertical  fixed-left  navbar-expand-xs navbar-light bg-white" id="sidenav-main">
@@ -149,26 +182,28 @@
         <div class="header-body">
           <div class="row align-items-center py-4">
             <div class="col-lg-6 col-7">
-              <div class="text-white d-inline-block mb-0" style="font-size: x-large;">在线消防地图</div>
+              <div class="text-white d-inline-block mb-0" style="font-size: x-large;margin-bottom: 10px;margin-top: 10px;">消防出警规划</div>
             </div>
-            <div class="col-lg-6 col-5 text-right">
-              <a href="#" class="btn btn-neutral" style="font-size: large;">逃生消防图</a>
-              <a href="#" class="btn btn-neutral" style="font-size: large;">寻找消防栓</a>
-            </div>
+            
           </div>
         </div>
       </div>
     </div>
     <!-- Page content -->
+    
     <div class="container mt--6">
       <div class="row" >
         <div class="col" >
           <div class="card border-0">
-            <div id="map-default" class="map-canvas" data-lat="40.748817" data-lng="-73.985428" style="height: 480px;"></div>
+            <div id="containerMap" class="map-canvas" data-lat="40.748817" data-lng="-73.985428" style="height: 480px;">
+            </div>
+            <div id="panel1"></div>
           </div>
         </div>
       </div>
+  </div>  
   </div>
+  
   <!-- Argon Scripts -->
   <!-- Core -->
   <script src="assets/vendor/jquery/dist/jquery.min.js"></script>
@@ -180,9 +215,34 @@
   <script src="assets/vendor/chart.js/dist/Chart.min.js"></script>
   <script src="assets/vendor/chart.js/dist/Chart.extension.js"></script>
   <!-- Optional JS -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDTTfWur0PDbZWPr7Pmq8K3jiDp0_xUziI"></script>
+  
   <!-- Argon JS -->
   <script src="assets/js/argon.js?v=1.2.0"></script>
+  <script type="text/javascript">
+    //基本地图加载
+    var map = new AMap.Map("containerMap", {
+        resizeEnable: true,
+        center: [120.07, 30.16023],//地图中心点
+        zoom: 13 //地图显示的缩放级别
+    });
+    //构造路线导航类
+    var driving = new AMap.Driving({
+        map: map,
+        panel: "panel1"
+    }); 
+    // 根据起终点名称规划驾车导航路线
+    driving.search([
+        {keyword: '消防站',city:'杭州'},
+        {keyword: '紫金港校区',city:'杭州'}
+    ], function(status, result) {
+        // result 即是对应的驾车导航信息，相关数据结构文档请参考  https://lbs.amap.com/api/javascript-api/reference/route-search#m_DrivingResult
+        if (status === 'complete') {
+            log.success('绘制驾车路线完成')
+        } else {
+            log.error('获取驾车数据失败：' + result)
+        }
+    });
+</script>
 </body>
 
 </html>
