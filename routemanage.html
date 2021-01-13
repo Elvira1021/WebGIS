@@ -40,9 +40,9 @@
         #panel1 {
             position: fixed;
             background-color: white;
-            max-height: 400px;
+            max-height: 420px;
             overflow-y: auto;
-            top: 100px;
+            top: 120px;
             right: 20px;
             width: 320px;
         }
@@ -181,8 +181,79 @@
       <div class="container-fluid">
         <div class="header-body">
           <div class="row align-items-center py-4">
-            <div class="col-lg-6 col-7">
+            <div class="col-lg-6 col-6">
               <div class="text-white d-inline-block mb-0" style="font-size: x-large;margin-bottom: 10px;margin-top: 10px;">消防出警规划</div>
+            </div>
+            <div class="col-lg-3 col-5 text-right">
+              <div class="col">
+                <h4 class='txt-l text-white mb6'>消防救援大队：</h4>
+              </div>
+              <div class="row">
+                  
+                  <div class="col">        
+                    <div id='params' class='mb12 mr12 toggle-group align-center'>
+                      <select name="place" id="place">
+                        <option value="0">滨江区消防救援大队</option>
+                        <option value="1">上城区消防救援大队</option>
+                        <option value="2">余杭区消防救援大队</option>
+                        <option value="3">下城区消防救援大队</option>
+                        <option value="4">萧山区消防救援大队</option>
+                        <option value="5">富阳区消防救援大队</option>
+                        <option value="6">临安区消防救援大队</option>
+                        <option value="7"> 西湖风景名胜区消防救援大队</option>
+                        <option value="8">钱塘新区消防救援大队</option>
+                        <option value="9">淳安县消防救援大队</option>
+                        <option value="10">西湖区消防救援大队</option>
+                        <option value="11">江干区消防救援大队</option>
+                        <option value="12">建德市消防救援大队</option>
+                        <option value="13">桐庐县消防救援大队</option>
+                        <option value="14">拱墅区消防救援大队</option>
+                        <option value="15">滨江区消防救援大队</option>
+                      </select>
+                    </div>
+                    </div>
+                  </div>
+              </div> 
+            <div class="col-lg-2 col-4" style="margin-left: 40px;">
+              <!-- Button trigger modal -->
+            <button type="button" class="btn btn-neutral" data-toggle="modal" data-target="#exampleModal">
+              火警申报
+            </button>
+
+            <!-- Modal -->
+            <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">火警申报</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    <form>
+                      <div class="form-group">
+                          <label for="example-text-input" class="form-control-label">详细地点</label>
+                          <input class="form-control" type="text" id="example-text-input">
+                      </div>
+                      <div class="form-group">
+                        <label for="example-tel-input" class="form-control-label">联系方式</label>
+                        <input class="form-control" type="tel"  id="example-tel-input">
+                     </div>
+                      <div class="form-group">
+                          <label for="example-tel-input" class="form-control-label">您的电话</label>
+                          <input class="form-control" type="tel"  id="example-tel-input">
+                      </div>
+                     
+                  </form>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">提交</button>
+                  </div>
+                </div>
+              </div>
+            </div>
             </div>
             
           </div>
@@ -195,12 +266,13 @@
       <div class="row" >
         <div class="col" >
           <div class="card border-0">
-            <div id="containerMap" class="map-canvas" data-lat="40.748817" data-lng="-73.985428" style="height: 480px;">
+            <div id="containerMap" class="map-canvas" data-lat="40.748817" data-lng="-73.985428" style="height: 470px;">
             </div>
             <div id="panel1"></div>
           </div>
         </div>
       </div>
+
   </div>  
   </div>
   
@@ -225,15 +297,45 @@
         center: [120.07, 30.16023],//地图中心点
         zoom: 13 //地图显示的缩放级别
     });
-    //构造路线导航类
-    var driving = new AMap.Driving({
-        map: map,
-        panel: "panel1"
-    }); 
-    // 根据起终点名称规划驾车导航路线
+    var data1;
+    AMap.plugin('AMap.Geolocation', function() {
+        var geolocation = new AMap.Geolocation({
+            enableHighAccuracy: true,//是否使用高精度定位，默认:true
+            timeout: 10000,          //超过10秒后停止定位，默认：5s
+            buttonPosition:'RB',    //定位按钮的停靠位置
+            buttonOffset: new AMap.Pixel(10, 20),//定位按钮与设置的停靠位置的偏移量，默认：Pixel(10, 20)
+            zoomToAccuracy: true,   //定位成功后是否自动调整地图视野到定位点
+
+        });
+        map.addControl(geolocation);
+        geolocation.getCurrentPosition(function(status,result){
+            if(status=='complete'){
+                onComplete(result)
+                //console.log(result)
+            }else{
+                onError(result)
+            }
+        });
+    });
+    //解析定位结果
+    function onComplete(data) {
+      data1=data
+      AMap.plugin('AMap.Autocomplete', function(){
+      // 实例化Autocomplete
+      var autoOptions = {
+        //city 限定城市，默认全国
+        city: '杭州'
+      }
+      var autoComplete= new AMap.Autocomplete(autoOptions);
+      autoComplete.search("消防站", function(status, result) {
+        // 搜索成功时，result即是对应的匹配数据
+        console.log(result)
+      })
+    })
+      // 根据起终点名称规划驾车导航路线
     driving.search([
-        {keyword: '消防站',city:'杭州'},
-        {keyword: '紫金港校区',city:'杭州'}
+        {keyword: '滨江区消防救援大队',city:'杭州'},
+        {keyword:data.formattedAddress,city:'杭州'}
     ], function(status, result) {
         // result 即是对应的驾车导航信息，相关数据结构文档请参考  https://lbs.amap.com/api/javascript-api/reference/route-search#m_DrivingResult
         if (status === 'complete') {
@@ -242,6 +344,35 @@
             log.error('获取驾车数据失败：' + result)
         }
     });
+    }
+    //解析定位错误信息
+    function onError(data) {
+        
+    }
+    //构造路线导航类
+    var driving = new AMap.Driving({
+        map: map,
+        panel: "panel1"
+    }); 
+
+    place.addEventListener('change', function (e) {
+    console.log(e.target.selectedOptions[0].text) 
+    driving.search([
+        {keyword:e.target.selectedOptions[0].text,city:'杭州'},
+        {keyword:data1.formattedAddress,city:'杭州'}
+    ], function(status, result) {
+        // result 即是对应的驾车导航信息，相关数据结构文档请参考  https://lbs.amap.com/api/javascript-api/reference/route-search#m_DrivingResult
+        if (status === 'complete') {
+            log.success('绘制驾车路线完成')
+        } else {
+            log.error('获取驾车数据失败：' + result)
+        }
+    });
+  });
+    
+    
+
+  
 </script>
 </body>
 
