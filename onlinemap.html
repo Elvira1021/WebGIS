@@ -24,7 +24,9 @@
   <!-- Page plugins -->
   <!-- Argon CSS -->
   <link rel="stylesheet" href="assets/css/argon.css?v=1.2.0" type="text/css">
-
+  <script src="https://a.amap.com/jsapi_demos/static/demo-center/js/demoutils.js"></script>
+  <script type="text/javascript"
+    src="https://webapi.amap.com/maps?v=1.4.15&key=d644ec9c6fac203f3818eb86bbeba5fe&plugin=AMap.ToolBar"></script>
 
 </head>
 
@@ -154,7 +156,8 @@
               <div class="text-white d-inline-block mb-0" style="font-size: x-large;">在线消防地图</div>
             </div>
             <div class="col-lg-6 col-5 text-right">
-              <a href="#" class="btn btn-neutral" style="font-size: large;">逃生消防图</a>
+              <a href="#" class="btn btn-neutral" style="font-size: large;" id="runawaybtn"
+                onclick="dp('map-default','containerMap')">逃生消防图</a>
               <a href="#" class="btn btn-neutral" style="font-size: large;">寻找消防栓</a>
             </div>
           </div>
@@ -167,6 +170,9 @@
         <div class="col">
           <div class="card border-0">
             <div id="map-default" class="map-canvas" data-lat="40.748817" data-lng="-73.985428" style="height: 480px;">
+            </div>
+            <div id="containerMap" class="map-canvas" data-lat="40.748817" data-lng="-73.985428"
+              style="height: 480px; display:none">
             </div>
           </div>
         </div>
@@ -183,13 +189,60 @@
     <script src="assets/vendor/chart.js/dist/Chart.min.js"></script>
     <script src="assets/vendor/chart.js/dist/Chart.extension.js"></script>
     <!-- Optional JS -->
-    <!-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDTTfWur0PDbZWPr7Pmq8K3jiDp0_xUziI"></script> -->
     <!-- Argon JS -->
     <script src="assets/js/argon.js?v=1.2.0"></script>
     <!-- Map -->
     <link rel="stylesheet" href="https://js.arcgis.com/4.18/esri/css/main.css">
     <script src="https://js.arcgis.com/4.18/"></script>
     <script src="assets/js/onlinemap.js"></script>
+    <script type="text/javascript">
+      function dp(id1, id2) {
+        var target1 = document.getElementById(id1);
+        var target2 = document.getElementById(id2);
+        var title = document.getElementById('runawaybtn');
+        if (target1.style.display == "none") {
+          target1.style.display = "";
+          target2.style.display = "none";
+          title.style.color = '#5E72E4';
+        } else {
+          target1.style.display = "none";
+          target2.style.display = "";
+          title.style.color = '#000099';
+        }
+      }
+
+      //基本地图加载
+      var map = new AMap.Map("containerMap", {
+        resizeEnable: true,
+        center: [120.164459, 30.25292],//地图中心点
+        zoom: 19 //地图显示的缩放级别
+      });
+      map.IndoorMap().showIndoorMap({
+        indoorid: 'B0FFF35KRM',
+      });
+
+      /* var map = new AMap.Map('containerMap', {
+        resizeEnable: true,
+        center: [120.164459, 30.25292],
+        zoom: 18,
+        pitch: 50,
+        viewMode: '3D'
+      });
+      map.on('indoor_create', function () {
+        map.indoorMap.showIndoorMap('B0FFJYKKR1', 1);  //湖滨银泰in77E区
+      }) */
+      AMap.plugin(['AMap.IndoorMap'], function () {
+        var indoorMap = new AMap.IndoorMap({ alwaysShow: true });
+        //设定在没有矢量底图的时候也显示，默认情况下室内图仅在有矢量底图的时候显示
+        var map = new AMap.Map('container', {
+          resizeEnable: true,
+          showIndoorMap: false,//隐藏地图自带的室内地图图层
+          layers: [indoorMap]
+        });
+        indoorMap.showIndoorMap('B000A856LJ');
+      });
+    </script>
+    <script type="text/javascript" src="https://webapi.amap.com/demos/js/liteToolbar.js"></script>
 </body>
 
 </html>

@@ -910,7 +910,7 @@ var SalesChart = (function () {
 	function init($chart) {
 
 		var salesChart = new Chart($chart, {
-			type: 'line',
+			type: 'bar',
 			options: {
 				scales: {
 					yAxes: [{
@@ -919,13 +919,7 @@ var SalesChart = (function () {
 							color: Charts.colors.gray[900],
 							zeroLineColor: Charts.colors.gray[900]
 						},
-						ticks: {
-							callback: function (value) {
-								if (!(value % 10)) {
-									return '$' + value + 'k';
-								}
-							}
-						}
+
 					}]
 				},
 				tooltips: {
@@ -935,21 +929,18 @@ var SalesChart = (function () {
 							var yLabel = item.yLabel;
 							var content = '';
 
-							if (data.datasets.length > 1) {
-								content += '<span class="popover-body-label mr-auto">' + label + '</span>';
-							}
-
-							content += '<span class="popover-body-value">$' + yLabel + 'k</span>';
+							if (yLabel > 100) content += '发生火灾' + yLabel + '起';
+							else content += '经济损失' + yLabel + '百万元';
 							return content;
 						}
 					}
 				}
 			},
 			data: {
-				labels: ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+				labels: ['第一季度', '第二季度', '第三季度', '第四季度'],
 				datasets: [{
-					label: 'Performance',
-					data: [0, 20, 10, 30, 15, 40, 20, 60, 60]
+					label: '火灾数',
+					data: [251, 371, 360, 354]
 				}]
 			}
 		});
