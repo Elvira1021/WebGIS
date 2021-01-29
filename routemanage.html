@@ -27,7 +27,12 @@
   <!--Map-->
   
   <script src="https://a.amap.com/jsapi_demos/static/demo-center/js/demoutils.js"></script>
+
+  <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=d644ec9c6fac203f3818eb86bbeba5fe&plugin=AMap.Geocoder"></script>
   <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=d644ec9c6fac203f3818eb86bbeba5fe&plugin=AMap.Driving"></script>
+
+
+
   <script type="text/javascript" src="https://cache.amap.com/lbs/static/addToolbar.js"></script>
   <style type="text/css">
 
@@ -56,6 +61,10 @@
    	        border-bottom-right-radius: 4px;
             overflow: hidden;
         }
+
+
+
+
     </style>
 
 </head>
@@ -268,6 +277,8 @@
           <div class="card border-0">
             <div id="containerMap" class="map-canvas" data-lat="40.748817" data-lng="-73.985428" style="height: 470px;">
             </div>
+
+
             <div id="panel1"></div>
           </div>
         </div>
@@ -298,6 +309,13 @@
         zoom: 13 //地图显示的缩放级别
     });
     var data1;
+    var lnglat1;
+        //构造路线导航类
+    var driving = new AMap.Driving({
+        map: map,
+        panel: "panel1",
+        policy: AMap.DrivingPolicy.LEAST_TIME
+    }); 
     AMap.plugin('AMap.Geolocation', function() {
         var geolocation = new AMap.Geolocation({
             enableHighAccuracy: true,//是否使用高精度定位，默认:true
@@ -309,17 +327,90 @@
         });
         map.addControl(geolocation);
         geolocation.getCurrentPosition(function(status,result){
+          console.log(result);
+          if(result.info=="FAILED")
+          {
+            alert("无法获取位置信息，请手动选点");
+            map.on("click",function(e){
+              lnglat1=e.lnglat;
+/*
+            var geocoder = new AMap.Geocoder({
+                city: "杭州", 
+            });
+
+            geocoder.getLocation("滨江区消防救援大队", function(status, result) {
+              if (status === 'complete'&&result.geocodes.length) {
+                var lnglat = result.geocodes[0].location;
+                lnglat1= lnglat;
+              }else{
+                log.error('根据地址查询位置失败');
+              }
+            });*/
+
+            AMap.plugin('AMap.Geocoder', function() {
+              var geocoder = new AMap.Geocoder({
+    // city 指定进行编码查询的城市，支持传入城市名、adcode 和 citycode
+                city: '杭州'
+              })
+
+            var selects = document.getElementById("place");
+            var indexs = selects.selectedIndex;  //选中项的索引
+            //alert(selects.options[indexs].text);
+            geocoder.getLocation(selects.options[indexs].text, function(status, result) {
+                if (status === 'complete' && result.info === 'OK') {
+
+                  var lnglat = result.geocodes[0].location;
+
+
+                  // 根据起终点经纬度规划驾车导航路线
+
+                  driving.search(lnglat, e.lnglat, function(status, result) {
+                  // result 即是对应的驾车导航信息，相关数据结构文档请参考  https://lbs.amap.com/api/javascript-api/reference/route-search#m_DrivingResult
+                    if (status === 'complete') {
+                      log.success('绘制驾车路线完成')
+                    } else {
+                      log.error('获取驾车数据失败：' + result)
+                    }
+                  });
+                }else{
+                    log.error('根据地址查询位置失败');
+                }
+                
+              })
+            });
+
+
+
+
+
+
+
+
+
+            });//单击结束
+
+
+
+          }//if结束
+
+          else
+          {
             if(status=='complete'){
-                onComplete(result)
+              onComplete(result)
                 //console.log(result)
-            }else{
-                onError(result)
             }
+            else
+            {
+              onError(result)
+            }
+          }
+
         });
     });
     //解析定位结果
     function onComplete(data) {
-      data1=data
+      data1=data;
+      /*
       AMap.plugin('AMap.Autocomplete', function(){
       // 实例化Autocomplete
       var autoOptions = {
@@ -331,7 +422,8 @@
         // 搜索成功时，result即是对应的匹配数据
         console.log(result)
       })
-    })
+    })*/
+      
       // 根据起终点名称规划驾车导航路线
     driving.search([
         {keyword: '滨江区消防救援大队',city:'杭州'},
@@ -349,25 +441,70 @@
     function onError(data) {
         
     }
-    //构造路线导航类
-    var driving = new AMap.Driving({
-        map: map,
-        panel: "panel1"
-    }); 
+
 
     place.addEventListener('change', function (e) {
-    console.log(e.target.selectedOptions[0].text) 
-    driving.search([
-        {keyword:e.target.selectedOptions[0].text,city:'杭州'},
-        {keyword:data1.formattedAddress,city:'杭州'}
-    ], function(status, result) {
+    console.log(e.target.selectedOptions[0].text);
+    //alert(lnglat1);
+    if(lnglat1==undefined)
+    {
+      if(data1!=undefined)
+        if(data1.info!="FAILED")
+        {
+          driving.search([
+            {keyword:e.target.selectedOptions[0].text,city:'杭州'},
+            {keyword:data1.formattedAddress,city:'杭州'},
+
+
+            ], function(status, result) {
         // result 即是对应的驾车导航信息，相关数据结构文档请参考  https://lbs.amap.com/api/javascript-api/reference/route-search#m_DrivingResult
         if (status === 'complete') {
-            log.success('绘制驾车路线完成')
+          log.success('绘制驾车路线完成')
         } else {
-            log.error('获取驾车数据失败：' + result)
+          log.error('获取驾车数据失败：' + result)
         }
-    });
+      });
+        }
+      } 
+      else
+      {
+            AMap.plugin('AMap.Geocoder', function() {
+              var geocoder = new AMap.Geocoder({
+    // city 指定进行编码查询的城市，支持传入城市名、adcode 和 citycode
+                city: '杭州'
+              })
+
+            var selects = document.getElementById("place");
+            var indexs = selects.selectedIndex;  //选中项的索引
+            //alert(selects.options[indexs].text);
+            geocoder.getLocation(selects.options[indexs].text, function(status, result) {
+                if (status === 'complete' && result.info === 'OK') {
+
+                  var lnglat = result.geocodes[0].location;
+
+
+                  // 根据起终点经纬度规划驾车导航路线
+
+                  driving.search(lnglat, lnglat1, function(status, result) {
+                  // result 即是对应的驾车导航信息，相关数据结构文档请参考  https://lbs.amap.com/api/javascript-api/reference/route-search#m_DrivingResult
+                    if (status === 'complete') {
+                      log.success('绘制驾车路线完成')
+                    } else {
+                      log.error('获取驾车数据失败：' + result)
+                    }
+                  });
+                }else{
+                    log.error('根据地址查询位置失败');
+                }
+                
+              })
+            });
+
+      }
+
+
+
+
   });
     
     
