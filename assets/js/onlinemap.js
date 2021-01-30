@@ -45,10 +45,41 @@ require([
             ]
         }
     });
+    const PoolLayer = new FeatureLayer({
+        url:
+            "https://services9.arcgis.com/lYhg5zlSTPlHaacE/arcgis/rest/services/pool/FeatureServer",
+        title: "杭州消防水池分布",
+        popupTemplate: {
+            // autocast as esri/PopupTemplate
+            title: "{name}",
+            content: [
+                {
+                    // It is also possible to set the fieldInfos outside of the content
+                    // directly in the popupTemplate. If no fieldInfos is specifically set
+                    // in the content, it defaults to whatever may be set within the popupTemplate.
+                    type: "fields",
+                    fieldInfos: [
+                        {
+                            fieldName: "address",
+                            label: "地址"
+                        },
+                        {
+                            fieldName: "id",
+                            label: "id"
+                        },
+                        {
+                            fieldName: "adname",
+                            label: "所属地市区县"
+                        }]
+                }
+            ]
+        }
+    });
+
 
     var map = new Map({
         basemap: "topo-vector",
-        layers: [FireLayer]
+        layers: [FireLayer, PoolLayer]
     });
 
     var view = new MapView({
@@ -59,13 +90,27 @@ require([
     });
 
     /* const legend = new Legend({
-      view: view,
-      style: {
-        type: "card",
-        layout: "side-by-side"
-      }
+        view: view,
+        FeatureLayer: [FireLayer, PoolLayer],
+        style: {
+            type: "card",
+            layout: "side-by-side"
+        }
     });
 
-    view.ui.add(legend, "top-right"); */
+
+    view.ui.add(legend, "bottom-left"); */
+    view.ui.add("topbar", "bottom-left");
+
+    var buttonBooth = document.getElementById('BoothButton');
+    var buttonPool = document.getElementById('PoolButton');
+    buttonBooth.onclick = function () {
+        view.center = [120.100, 30.20];
+        view.zoom = 9;
+    }
+    buttonPool.onclick = function () {
+        view.center = [120.110, 30.21];
+        view.zoom = 12.5;
+    }
 
 });
