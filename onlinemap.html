@@ -157,8 +157,8 @@
             </div>
             <div class="col-lg-6 col-5 text-right">
               <a href="#" class="btn btn-neutral" style="font-size: large;" id="runawaybtn"
-                onclick="dp('map-default','containerMap')">逃生消防图</a>
-              <a href="#" class="btn btn-neutral" style="font-size: large;">寻找消防栓</a>
+                onclick="dp('map-default','containerMap')">消防安全指数</a>
+              <!-- <a href="#" class="btn btn-neutral" style="font-size: large;">寻找消防栓</a> -->
             </div>
           </div>
         </div>
@@ -201,6 +201,10 @@
     <link rel="stylesheet" href="https://js.arcgis.com/4.18/esri/css/main.css">
     <script src="https://js.arcgis.com/4.18/"></script>
     <script src="assets/js/onlinemap.js"></script>
+    <script type="text/javascript" src="assets/js/heatmapData.js"></script>
+    <script
+      src="https://webapi.amap.com/maps?v=1.4.15&key=975b5a580bdbc0d7213abacb2b7965d5&plugin=AMap.CustomLayer,AMap.ControlBar,AMap.Heatmap"></script>
+    <script src="https://a.amap.com/jsapi_demos/static/bezier/bezier.js"></script>
     <script type="text/javascript">
       function dp(id1, id2) {
         var target1 = document.getElementById(id1);
@@ -217,38 +221,35 @@
         }
       }
 
-      //基本地图加载
       var map = new AMap.Map("containerMap", {
-        resizeEnable: true,
-        center: [120.164459, 30.25292],//地图中心点
-        zoom: 19 //地图显示的缩放级别
-      });
-      map.IndoorMap().showIndoorMap({
-        indoorid: 'B0FFF35KRM',
-      });
-
-      /* var map = new AMap.Map('containerMap', {
+        viewMode: '3D',
+        pitch: 70,
         resizeEnable: true,
         center: [120.164459, 30.25292],
-        zoom: 18,
-        pitch: 50,
-        viewMode: '3D'
+        zoom: 11.5
       });
-      map.on('indoor_create', function () {
-        map.indoorMap.showIndoorMap('B0FFJYKKR1', 1);  //湖滨银泰in77E区
-      }) */
-      AMap.plugin(['AMap.IndoorMap'], function () {
-        var indoorMap = new AMap.IndoorMap({ alwaysShow: true });
-        //设定在没有矢量底图的时候也显示，默认情况下室内图仅在有矢量底图的时候显示
-        var map = new AMap.Map('container', {
-          resizeEnable: true,
-          showIndoorMap: false,//隐藏地图自带的室内地图图层
-          layers: [indoorMap]
-        });
-        indoorMap.showIndoorMap('B000A856LJ');
+
+      map.addControl(new AMap.ControlBar({}));
+
+      var heatmapOpts = {
+        //3d 相关的参数
+        '3d': {
+          //热度转高度的曲线控制参数
+          heightBezier: [0.4, 0.2, 0.4, 0.8],
+          //取样精度，值越小，曲面效果越精细，但同时性能消耗越大
+          gridSize: 2,
+          heightScale: 1
+        }
+      };
+
+      //初始化heatmap对象
+      var heatmap = new AMap.Heatmap(map, heatmapOpts);
+
+      heatmap.setDataSet({
+        data: heatmapData,
+        max: 100
       });
     </script>
-    <script type="text/javascript" src="https://webapi.amap.com/demos/js/liteToolbar.js"></script>
 </body>
 
 </html>
